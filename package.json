@@ -11,6 +11,14 @@
   },
   "author": "Ronald Chen",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/concept-not-found/spec-check.git"
+  },
+  "bugs": {
+    "url": "https://github.com/concept-not-found/spec-check/issues"
+  },
+  "homepage": "https://github.com/concept-not-found/spec-check#readme",
   "dependencies": {
     "marked": "0.3.17"
   },
