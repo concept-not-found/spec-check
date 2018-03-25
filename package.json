@@ -1,0 +1,26 @@
+{
+  "name": "spec-check",
+  "version": "0.0.1",
+  "description": "Executable specification in Markdown for Javascript",
+  "main": "index.js",
+  "bin": {
+    "spec-check": "./index.js"
+  },
+  "scripts": {
+    "lint": "eslint --fix ."
+  },
+  "author": "Ronald Chen",
+  "license": "ISC",
+  "dependencies": {
+    "marked": "0.3.17"
+  },
+  "devDependencies": {
+    "eslint": "4.18.2",
+    "eslint-config-standard": "11.0.0",
+    "eslint-plugin-import": "2.9.0",
+    "eslint-plugin-node": "6.0.1",
+    "eslint-plugin-promise": "3.6.0",
+    "eslint-plugin-react": "7.7.0",
+    "eslint-plugin-standard": "3.0.1"
+  }
+}
