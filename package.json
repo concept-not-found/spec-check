@@ -9,6 +9,10 @@
   "scripts": {
     "lint": "eslint --fix ."
   },
+  "keywords": [
+    "specification",
+    "markdown"
+  ],
   "author": "Ronald Chen",
   "license": "ISC",
   "repository": {
