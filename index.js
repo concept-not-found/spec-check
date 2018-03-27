@@ -4,11 +4,15 @@ const assert = require('assert')
 const fs = require('fs')
 const path = require('path')
 const {inspect, promisify} = require('util')
-const marked = require('marked')
+const Unified = require('unified')
+const RemarkParse = require('remark-parse')
+const RemarkStringify = require('remark-stringify')
+const Minimist = require('minimist')
 
 const readFile = promisify(fs.readFile)
+const writeFile = promisify(fs.writeFile)
 
-function parseOptions (options) {
+function parseOptions ({_: options, report}) {
   const requires = {}
   let documentFilename
   options.forEach((option) => {
@@ -23,76 +27,113 @@ function parseOptions (options) {
     throw new Error('missing document filename')
   }
   return {
+    report,
     requires,
     documentFilename
   }
 }
-async function main () {
-  const [, , ...options] = process.argv
-  const {requires, documentFilename} = parseOptions(options)
-  const document = await readFile(path.join(process.cwd(), documentFilename), 'utf8')
-  const tokens = marked.lexer(document, {
-    gfm: true,
-    tables: true,
-    breaks: true
-  })
-
-  Object.keys(requires).forEach((name) => {
-    eval(`${name} = require('${path.join(process.cwd(), requires[name])}')`) // eslint-disable-line no-eval
-  })
-  function scopedEval (code) {
-    return eval(code) // eslint-disable-line no-eval
-  }
-
-  const codeBlocks = [].concat(...tokens
-    .filter(({type, lang}) => type === 'code' && ['js', 'javascript'].includes(lang))
-    .map(({text}) => text.split('\n')
-      .reduce(({results, input}, line) => {
-        if (input) {
-          return {
-            results: [...results, {
-              input: input,
-              output: line
-            }]
+function flatmap (closure, array) {
+  return [].concat(...array.map(closure))
+}
+function scopedEval (code) {
+  return eval(code) // eslint-disable-line no-eval
+}
+function SpecCheck () {
+  return (root, file) => {
+    root.children = flatmap((node) => {
+      if (!(node.type === 'code' && ['js', 'javascript'].includes(node.lang))) {
+        return [node]
+      }
+      const lines = node.value.split('\n')
+      let input
+      let result
+      let expected
+      try {
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].startsWith('> ')) {
+            input = lines[i].substr(2)
+            try {
+              result = scopedEval(`(${input})`)
+            } catch (error) {
+              if (error instanceof Error) {
+                result = `Error: ${error.message}`
+              } else {
+                throw error
+              }
+            }
+          } else {
+            const output = lines[i]
+            try {
+              if (output.startsWith('Error: ')) {
+                expected = output
+              } else {
+                expected = scopedEval(`(${output})`)
+              }
+            } catch (error) {
+              throw new Error(`failed to eval output ${output}: ${error.message}`)
+            }
+            try {
+              assert.deepEqual(result, expected)
+            } catch (error) {
+              throw new Error(`${input} => expected ${inspect(expected, false, null)}, but got ${inspect(result, false, null)}`)
+            }
           }
         }
-        if (!line.startsWith('> ')) {
-          throw new Error('expected input line start with `> `')
-        }
-        return {
-          results,
-          input: line.substr(2)
-        }
-      }, {
-        results: []
-      }).results))
-  codeBlocks.forEach(({input, output}) => {
-    let result
-    let expected
-    try {
-      result = scopedEval(input)
-    } catch (error) {
-      if (error instanceof Error) {
-        result = `Error: ${error.message}`
-      } else {
-        throw error
+        return [node, {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'text',
+              value: '✅ '
+            },
+            {
+              type: 'link',
+              url: 'https://github.com/concept-not-found/spec-check',
+              children: [
+                {
+                  type: 'inlineCode',
+                  value: 'spec-check'
+                }
+              ]
+            },
+            {
+              type: 'text',
+              value: 'ed'
+            }
+          ]
+        }]
+      } catch (error) {
+        return [node, {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'text',
+              value: '❌ '
+            },
+            {
+              type: 'inlineCode',
+              value: `Error: ${error.message}`
+            }
+          ]
+        }]
       }
-    }
-    try {
-      if (output.startsWith('Error: ')) {
-        expected = output
-      } else {
-        expected = scopedEval(`const expected = ${output}; expected`)
-      }
-    } catch (error) {
-      throw new Error(`failed to eval output ${output}: ${error.message}`)
-    }
-    try {
-      assert.deepEqual(result, expected)
-    } catch (error) {
-      throw new Error(`${input} => expected ${inspect(expected, false, null)}, but got ${inspect(result, false, null)}`)
-    }
-  })
+    }, root.children)
+    return root
+  }
+}
+
+async function main () {
+  const [, , ...options] = process.argv
+  const {report, requires, documentFilename} = parseOptions(Minimist(options))
+  const document = await readFile(path.join(process.cwd(), documentFilename), 'utf8')
+  const processed = await Unified()
+    .use(RemarkParse)
+    .use(SpecCheck)
+    .use(RemarkStringify)
+    .process(document)
+  if (report) {
+    await writeFile(report, processed)
+  }
 }
 main()
   .then(() => process.exit(0))

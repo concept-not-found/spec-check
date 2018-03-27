@@ -35,9 +35,6 @@ We can check `index.js` against `specification.md` using `spec-check leftPad=ind
 
 `spec-check` will load `index.js` as the variable `leftPad` for the scope of the test. `spec-check` then executes all the `` ```js `` code blocks. Think of each code block as the Node.js CLI, each `>` is input that is `eval` and the output is on the next line. `spec-check` executes the `>` lines and checks the output matches expected output in the document.
 
-## Installation
-`npm install --save-dev spec-check`
-
 ## Usage
 Edit `package.json` `scripts.test` to be `spec-check foo=index.js README.md`
 
