@@ -52,7 +52,7 @@ Error: oops
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
-### errors thrown by output lines rethrown
+### errors thrown by output lines are rethrown
 
 ```js
 > 'everything is fine'
