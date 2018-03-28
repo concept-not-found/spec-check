@@ -5,7 +5,6 @@ const Unified = require('unified')
 const RemarkParse = require('remark-parse')
 const RemarkStringify = require('remark-stringify')
 
-
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
@@ -26,7 +25,12 @@ async function main () {
     .process(expected)
   await writeFile('specification-input.md', input)
 
-  const specCheckProcess = spawn(require.resolve('./index.js'), ['--report', 'specification-report.md', 'specification-input.md'], {
+  const specCheckProcess = spawn(require.resolve('../index.js'), [
+    '--report',
+    'specification-report.md',
+    'add=test/add.js',
+    'specification-input.md'
+  ], {
     stdio: 'inherit'
   })
   const exitCode = await new Promise((resolve, reject) => {

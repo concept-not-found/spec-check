@@ -38,7 +38,10 @@ function flatmap (closure, array) {
 function scopedEval (code) {
   return eval(code) // eslint-disable-line no-eval
 }
-function SpecCheck () {
+function SpecCheck ({requires}) {
+  Object.keys(requires).forEach((name) => {
+    eval(`${name} = require('${path.join(process.cwd(), requires[name])}')`) // eslint-disable-line no-eval
+  })
   return (root, file) => {
     root.children = flatmap((node) => {
       if (!(node.type === 'code' && ['js', 'javascript'].includes(node.lang))) {
@@ -53,7 +56,7 @@ function SpecCheck () {
           if (lines[i].startsWith('> ')) {
             input = lines[i].substr(2)
             try {
-              result = scopedEval(`(${input})`)
+              result = scopedEval(input)
             } catch (error) {
               if (error instanceof Error) {
                 result = `Error: ${error.message}`
@@ -62,15 +65,18 @@ function SpecCheck () {
               }
             }
           } else {
+            if (i === 0) {
+              throw new Error('at least one input required')
+            }
             const output = lines[i]
             try {
               if (output.startsWith('Error: ')) {
                 expected = output
               } else {
-                expected = scopedEval(`(${output})`)
+                expected = scopedEval(output)
               }
             } catch (error) {
-              throw new Error(`failed to eval output ${output}: ${error.message}`)
+              throw new Error(`failed to eval output \`${output}\`: ${error.message}`)
             }
             try {
               assert.deepEqual(result, expected)
@@ -128,7 +134,9 @@ async function main () {
   const document = await readFile(path.join(process.cwd(), documentFilename), 'utf8')
   const processed = await Unified()
     .use(RemarkParse)
-    .use(SpecCheck)
+    .use(SpecCheck, {
+      requires
+    })
     .use(RemarkStringify)
     .process(document)
   if (report) {

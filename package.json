@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "eslint --fix .",
     "pretest": "rimraf specification-input.md specification-report.md",
-    "test": "node test.js"
+    "test": "node test/index.js"
   },
   "keywords": [
     "specification",
