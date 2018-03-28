@@ -1,6 +1,6 @@
 # `spec-check` specification
 
-This is a `spec-check` report which is also an executable specification for `spec-check`. The test will:
+This is a `spec-check` report which is also an executable specification for `spec-check`. The [test](https://github.com/concept-not-found/spec-check/blob/master/test/index.js) will:
 
 -   strip this document of ``✅ `spec-check`ed``
 -   strip this document of `❌ Error: ...`
