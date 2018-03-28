@@ -5,8 +5,7 @@ This is a `spec-check` report which is also an executable specification for `spe
 -   strip this document of ``✅ `spec-check`ed``
 -   strip this document of `❌ Error: ...`
 -   run `spec-check --report specification-report.md add=test/add.js specification-input.md`
-
-The result should be identical to this document.
+-   assert the result is identical to this document
 
 ## non js/javascript code blocks
 
