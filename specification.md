@@ -43,6 +43,17 @@ The result should be identical to this document.
 
 ❌ `Error: 'i hear you' => expected 'i understand you', but got 'i hear you'`
 
+### input and output lines can be interleaved, all output lines will be checked
+
+```js
+> 'knock knock'
+'knock knock'
+> 'who\'s there'
+'who\'s there'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
 ### errors thrown by input lines can be checked by Error output
 
 ```js
