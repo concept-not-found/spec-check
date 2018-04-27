@@ -16,24 +16,12 @@ function RemoveLinesAddedBySpecCheckReport () {
     return root
   }
 }
-async function main () {
-  const expected = await readFile('specification.md', 'utf8')
-  const input = await Unified()
-    .use(RemarkParse)
-    .use(RemoveLinesAddedBySpecCheckReport)
-    .use(RemarkStringify)
-    .process(expected)
-  await writeFile('specification-input.md', input)
 
-  const specCheckProcess = spawn(require.resolve('../index.js'), [
-    '--report',
-    'specification-report.md',
-    'add=test/add.js',
-    'specification-input.md'
-  ], {
+function runSpecCheck (...args) {
+  const specCheckProcess = spawn(require.resolve('../index.js'), args, {
     stdio: 'inherit'
   })
-  const exitCode = await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     let closed = false
     specCheckProcess.on('exit', (code, signal) => {
       if (!closed) {
@@ -48,13 +36,54 @@ async function main () {
       }
     })
   })
+}
+
+async function assertSpecification () {
+  const expected = await readFile('specification.md', 'utf8')
+  const input = await Unified()
+    .use(RemarkParse)
+    .use(RemoveLinesAddedBySpecCheckReport)
+    .use(RemarkStringify)
+    .process(expected)
+  await writeFile('specification-input.md', input)
+
+  const exitCode = await runSpecCheck(
+    '--report',
+    'specification-report.md',
+    'add=test/add.js',
+    'specification-input.md'
+  )
   if (exitCode !== 0) {
-    return
+    throw new Error(`expected --report option to always exit 0, but was ${exitCode}`)
   }
   const result = await readFile('specification-report.md', 'utf8')
   if (expected !== result) {
     throw new Error('expected specification.md to be the same as specification-report.md')
   }
+}
+
+async function assertNoErrorsTest () {
+  const exitCode = await runSpecCheck(
+    'test/no-errors.md'
+  )
+  if (exitCode !== 0) {
+    throw new Error(`expected exit 0, but was ${exitCode}`)
+  }
+}
+
+async function assertMultipleErrorsTest () {
+  const exitCode = await runSpecCheck(
+    'test/multiple-errors.md'
+  )
+  if (exitCode === 0) {
+    throw new Error(`expected exit to be not 0`)
+  }
+}
+
+async function main () {
+  await assertSpecification()
+  await assertNoErrorsTest()
+  await assertMultipleErrorsTest()
 }
 
 main()

@@ -38,7 +38,7 @@ function flatmap (closure, array) {
 function scopedEval (code) {
   return eval(code) // eslint-disable-line no-eval
 }
-function SpecCheck ({requires}) {
+function SpecCheck ({requires, errors}) {
   Object.keys(requires).forEach((name) => {
     eval(`${name} = require('${path.join(process.cwd(), requires[name])}')`) // eslint-disable-line no-eval
   })
@@ -109,6 +109,7 @@ function SpecCheck ({requires}) {
           ]
         }]
       } catch (error) {
+        errors.push({node, error})
         return [node, {
           type: 'paragraph',
           children: [
@@ -132,15 +133,20 @@ async function main () {
   const [, , ...options] = process.argv
   const {report, requires, documentFilename} = parseOptions(Minimist(options))
   const document = await readFile(path.join(process.cwd(), documentFilename), 'utf8')
+  const errors = []
   const processed = await Unified()
     .use(RemarkParse)
     .use(SpecCheck, {
-      requires
+      requires,
+      errors
     })
     .use(RemarkStringify)
     .process(document)
   if (report) {
     await writeFile(report, processed)
+  } else if (errors.length !== 0) {
+    errors.forEach(({node, error}) => console.error(`Line ${node.position.start.line}: ${error.message}`))
+    throw new Error('Errors present in specification')
   }
 }
 main()
