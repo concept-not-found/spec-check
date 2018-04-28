@@ -32,8 +32,8 @@ function parseOptions ({_: options, report}) {
     documentFilename
   }
 }
-function flatmap (closure, array) {
-  return [].concat(...array.map(closure))
+async function flatmap (closure, array) {
+  return [].concat(...await Promise.all(array.map(closure)))
 }
 function scopedEval (code) {
   return eval(code) // eslint-disable-line no-eval
@@ -42,8 +42,9 @@ function SpecCheck ({requires, errors}) {
   Object.keys(requires).forEach((name) => {
     eval(`${name} = require('${path.join(process.cwd(), requires[name])}')`) // eslint-disable-line no-eval
   })
-  return (root, file) => {
-    root.children = flatmap((node) => {
+  // transformer cannot be async due to https://github.com/unifiedjs/unified/issues/35
+  return (root) => {
+    return flatmap(async (node) => {
       if (!(node.type === 'code' && ['js', 'javascript'].includes(node.lang))) {
         return [node]
       }
@@ -58,11 +59,7 @@ function SpecCheck ({requires, errors}) {
             try {
               result = scopedEval(input)
             } catch (error) {
-              if (error instanceof Error) {
-                result = `Error: ${error.message}`
-              } else {
-                throw error
-              }
+              result = error
             }
           } else {
             if (i === 0) {
@@ -70,7 +67,55 @@ function SpecCheck ({requires, errors}) {
             }
             const output = lines[i]
             try {
-              if (output.startsWith('Error: ')) {
+              if (output.startsWith('Resolve: ')) {
+                try {
+                  result = {
+                    Resolve: await result
+                  }
+                } catch (error) {
+                  result = {
+                    Reject: error
+                  }
+                }
+                expected = {
+                  Resolve: scopedEval(output.substring('Resolve: '.length))
+                }
+              } else if (output.startsWith('Reject: ')) {
+                try {
+                  result = {
+                    Resolve: await result
+                  }
+                } catch (error) {
+                  result = {
+                    Reject: error
+                  }
+                }
+                expected = {
+                  Reject: scopedEval(output.substring('Reject: '.length))
+                }
+              } else if (output.startsWith('Reject error: ')) {
+                try {
+                  result = {
+                    Resolve: await result
+                  }
+                } catch (error) {
+                  result = `Reject error: ${error.message}`
+                }
+                expected = output
+              } else if (output.startsWith('Reject error code: ')) {
+                try {
+                  result = {
+                    Resolve: await result
+                  }
+                } catch (error) {
+                  result = `Reject error code: ${error.code}`
+                }
+                expected = output
+              } else if (output.startsWith('Error: ')) {
+                result = `Error: ${result.message}`
+                expected = output
+              } else if (output.startsWith('Error code: ')) {
+                result = `Error code: ${result.code}`
                 expected = output
               } else {
                 expected = scopedEval(output)
@@ -125,7 +170,10 @@ function SpecCheck ({requires, errors}) {
         }]
       }
     }, root.children)
-    return root
+      .then((result) => {
+        root.children = result
+        return root
+      })
   }
 }
 

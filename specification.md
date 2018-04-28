@@ -24,6 +24,62 @@ This is a `spec-check` report which is also an executable specification for `spe
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
+### Promise that resolve can be checked
+
+```js
+> Promise.resolve('Hello')
+Resolve: 'Hello'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### Promise that reject a value can be checked
+
+```js
+> Promise.reject('oops')
+Reject: 'oops'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### Promise that are expected to resolve, but are rejected error
+
+```js
+> Promise.resolve('Hello')
+Reject: 'Hello'
+```
+
+❌ `Error: Promise.resolve('Hello') => expected { Reject: 'Hello' }, but got { Resolve: 'Hello' }`
+
+### Promise that are expected to reject, but are resolved error
+
+```js
+> Promise.reject('oops')
+Resolve: 'oops'
+```
+
+❌ `Error: Promise.reject('oops') => expected { Resolve: 'oops' }, but got { Reject: 'oops' }`
+
+### Promise that reject an error can be checked by error message
+
+```js
+> Promise.reject(new Error('oops'))
+Reject error: oops
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### Promise that reject an error can be checked by error code
+
+```js
+> error = new Error('oops')
+> error.code = 'ERROR_OOPS'
+> Promise.reject(error)
+Reject error code: ERROR_OOPS
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
 ### requires such as `add=test/add.js` are in scope
 
 ```js
@@ -53,11 +109,22 @@ This is a `spec-check` report which is also an executable specification for `spe
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
-### errors thrown by input lines can be checked by Error output
+### errors thrown by input lines can be checked by error message
 
 ```js
 > throw new Error('oops')
 Error: oops
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### errors thrown by input lines can be checked by error code
+
+```js
+> error = new Error('oops')
+> error.code = 'ERROR_OOPS'
+> throw error
+Error code: ERROR_OOPS
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
@@ -77,6 +144,16 @@ throw new Error('oops')
 > name = 'Bob'
 > `Hi ${name}`
 'Hi Bob'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### multiple input lines swallow earlier errors
+
+```js
+> throw new Error('oops')
+> 'Everythign is fine.'
+'Everythign is fine.'
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed

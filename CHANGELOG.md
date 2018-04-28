@@ -1,3 +1,8 @@
+2.0.0 (April 27, 2018)
+ * added support for promises
+ * added support for error codes
+ * clarified errors in the start of consecutive input lines are swallowed
+
 1.0.0 (April 27, 2018)
  * prints line of errors in the spec
  * non-zero exit when there are errors when not using --report
