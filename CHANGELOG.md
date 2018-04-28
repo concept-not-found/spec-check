@@ -1,3 +1,6 @@
+3.0.0 (April 28, 2018)
+ * fixed issue where variable declartion would affect previous block when using promises
+
 2.0.0 (April 27, 2018)
  * added support for promises
  * added support for error codes

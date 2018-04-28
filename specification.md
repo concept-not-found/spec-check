@@ -174,3 +174,21 @@ undefined
 ```
 
 ❌ `Error: at least one input required`
+
+### each block finishes before the next
+
+```js
+> count = 10
+> Promise.resolve().then(() => count)
+Resolve: 10
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+```js
+> count = 100
+> Promise.resolve().then(() => count)
+Resolve: 100
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed

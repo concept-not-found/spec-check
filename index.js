@@ -32,8 +32,18 @@ function parseOptions ({_: options, report}) {
     documentFilename
   }
 }
-async function flatmap (closure, array) {
-  return [].concat(...await Promise.all(array.map(closure)))
+function flatmap (arrays) {
+  return [].concat(...arrays)
+}
+async function linearize (closure, array) {
+  const results = []
+  await array.reduce(async (previous, child) => {
+    await previous
+    const result = closure(child)
+    results.push(result)
+    return result
+  }, Promise.resolve())
+  return Promise.all(results)
 }
 function scopedEval (code) {
   return eval(code) // eslint-disable-line no-eval
@@ -44,7 +54,7 @@ function SpecCheck ({requires, errors}) {
   })
   // transformer cannot be async due to https://github.com/unifiedjs/unified/issues/35
   return (root) => {
-    return flatmap(async (node) => {
+    return linearize(async (node) => {
       if (!(node.type === 'code' && ['js', 'javascript'].includes(node.lang))) {
         return [node]
       }
@@ -171,7 +181,7 @@ function SpecCheck ({requires, errors}) {
       }
     }, root.children)
       .then((result) => {
-        root.children = result
+        root.children = flatmap(result)
         return root
       })
   }
