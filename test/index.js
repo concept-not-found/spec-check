@@ -45,20 +45,29 @@ async function assertSpecification () {
     .use(RemoveLinesAddedBySpecCheckReport)
     .use(RemarkStringify)
     .process(expected)
-  await writeFile('specification-input.md', input)
+  await writeFile('test/specification-input.md', input)
 
   const exitCode = await runSpecCheck(
     '--report',
-    'specification-report.md',
+    'test/specification-report.md',
     'add=test/add.js',
-    'specification-input.md'
+    'test/specification-input.md'
   )
   if (exitCode !== 0) {
     throw new Error(`expected --report option to always exit 0, but was ${exitCode}`)
   }
-  const result = await readFile('specification-report.md', 'utf8')
+  const result = await readFile('test/specification-report.md', 'utf8')
   if (expected !== result) {
-    throw new Error('expected specification.md to be the same as specification-report.md')
+    throw new Error('expected specification.md to be the same as test/specification-report.md')
+  }
+}
+
+async function assertParser () {
+  const exitCode = await runSpecCheck(
+    'test/parser.spec.md'
+  )
+  if (exitCode !== 0) {
+    throw new Error(`expected exit 0, but was ${exitCode}`)
   }
 }
 
@@ -81,6 +90,7 @@ async function assertMultipleErrorsTest () {
 }
 
 async function main () {
+  await assertParser()
   await assertSpecification()
   await assertNoErrorsTest()
   await assertMultipleErrorsTest()

@@ -1,3 +1,6 @@
+4.0.0 (May 1, 2018)
+ * added line continuation
+
 3.0.0 (April 28, 2018)
  * fixed issue where variable declartion would affect previous block when using promises
 

@@ -9,6 +9,8 @@ const RemarkParse = require('remark-parse')
 const RemarkStringify = require('remark-stringify')
 const Minimist = require('minimist')
 
+const parser = require('./parser')
+
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
@@ -58,14 +60,15 @@ function SpecCheck ({requires, errors}) {
       if (!(node.type === 'code' && ['js', 'javascript'].includes(node.lang))) {
         return [node]
       }
-      const lines = node.value.split('\n')
+      const rawLines = node.value.split('\n')
       let input
       let result
       let expected
       try {
+        const lines = parser(rawLines)
         for (let i = 0; i < lines.length; i++) {
-          if (lines[i].startsWith('> ')) {
-            input = lines[i].substr(2)
+          if (lines[i].type === 'input') {
+            input = lines[i].code
             try {
               result = scopedEval(input)
             } catch (error) {
@@ -77,7 +80,7 @@ function SpecCheck ({requires, errors}) {
             }
             const output = lines[i]
             try {
-              if (output.startsWith('Resolve: ')) {
+              if (output.type === 'resolve') {
                 try {
                   result = {
                     Resolve: await result
@@ -88,9 +91,9 @@ function SpecCheck ({requires, errors}) {
                   }
                 }
                 expected = {
-                  Resolve: scopedEval(output.substring('Resolve: '.length))
+                  Resolve: scopedEval(output.code)
                 }
-              } else if (output.startsWith('Reject: ')) {
+              } else if (output.type === 'reject') {
                 try {
                   result = {
                     Resolve: await result
@@ -101,9 +104,9 @@ function SpecCheck ({requires, errors}) {
                   }
                 }
                 expected = {
-                  Reject: scopedEval(output.substring('Reject: '.length))
+                  Reject: scopedEval(output.code)
                 }
-              } else if (output.startsWith('Reject error: ')) {
+              } else if (output.type === 'reject error') {
                 try {
                   result = {
                     Resolve: await result
@@ -111,27 +114,27 @@ function SpecCheck ({requires, errors}) {
                 } catch (error) {
                   result = `Reject error: ${error.message}`
                 }
-                expected = output
-              } else if (output.startsWith('Reject error code: ')) {
+                expected = `Reject error: ${output.message}`
+              } else if (output.type === 'reject error code') {
                 try {
                   result = {
                     Resolve: await result
                   }
                 } catch (error) {
-                  result = `Reject error code: ${error.code}`
+                  result = `Reject error code: ${error.errorCode}`
                 }
-                expected = output
-              } else if (output.startsWith('Error: ')) {
+                expected = `Reject error code: ${output.code}`
+              } else if (output.type === 'error') {
                 result = `Error: ${result.message}`
-                expected = output
-              } else if (output.startsWith('Error code: ')) {
+                expected = `Error: ${output.message}`
+              } else if (output.type === 'error code') {
                 result = `Error code: ${result.code}`
-                expected = output
+                expected = `Error code: ${output.errorCode}`
               } else {
-                expected = scopedEval(output)
+                expected = scopedEval(output.code)
               }
             } catch (error) {
-              throw new Error(`failed to eval output \`${output}\`: ${error.message}`)
+              throw new Error(`failed to eval output \`${lines[i].code}\`: ${error.message}`)
             }
             try {
               assert.deepEqual(result, expected)

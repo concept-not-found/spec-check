@@ -24,6 +24,56 @@ This is a `spec-check` report which is also an executable specification for `spe
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
+### `>` can be continued with `...`
+
+```js
+> 'Hello
+... world'
+'Hello world'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### Continuations collapses all whitespace to a single space
+
+```js
+> 'Hello      
+...      world'
+'Hello world'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### There can be multiple continuations
+
+```js
+> 'Hell
+... o 
+... world'
+'Hell o world'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### A block starting with a continuation errors
+
+```js
+... 42
+42
+```
+
+❌ `Error: Continuation must be preceded input or expected output. Cannot start with a continuation.`
+
+### Expected output can be continued with `...`
+
+```js
+> 'Hello world'
+'Hello 
+... world'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
 ### Promise that resolve can be checked
 
 ```js
@@ -33,7 +83,26 @@ Resolve: 'Hello'
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
+### Promise that resolve can be continued with `...`
+
+```js
+> Promise.resolve('Hello world')
+Resolve: 'Hello 
+... world'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
 ### Promise that reject a value can be checked
+
+```js
+> Promise.reject('oops')
+Reject: 'oops'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
+
+### Promise that reject a value can be continued with `...`
 
 ```js
 > Promise.reject('oops')
@@ -132,7 +201,7 @@ Error code: ERROR_OOPS
 ### errors thrown by output lines are rethrown
 
 ```js
-> 'everything is fine'
+> 'Everything is fine'
 throw new Error('oops')
 ```
 
@@ -152,13 +221,19 @@ throw new Error('oops')
 
 ```js
 > throw new Error('oops')
-> 'Everythign is fine.'
-'Everythign is fine.'
+> 'Everything is fine.'
+'Everything is fine.'
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
 ### each block is not isolated from each other, be careful
+
+```js
+> name = 'Bob'
+```
+
+✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
 ```js
 > name
