@@ -28,7 +28,7 @@ This is a `spec-check` report which is also an executable specification for `spe
 
 ```js
 > 'Hello
-... world'
+..world'
 'Hello world'
 ```
 
@@ -37,8 +37,8 @@ This is a `spec-check` report which is also an executable specification for `spe
 ### Continuations collapses all whitespace to a single space
 
 ```js
-> 'Hello      
-...      world'
+> 'Hello     
+..      world'
 'Hello world'
 ```
 
@@ -48,8 +48,8 @@ This is a `spec-check` report which is also an executable specification for `spe
 
 ```js
 > 'Hell
-... o 
-... world'
+..o 
+..world'
 'Hell o world'
 ```
 
@@ -58,7 +58,7 @@ This is a `spec-check` report which is also an executable specification for `spe
 ### A block starting with a continuation errors
 
 ```js
-... 42
+..42
 42
 ```
 
@@ -69,7 +69,7 @@ This is a `spec-check` report which is also an executable specification for `spe
 ```js
 > 'Hello world'
 'Hello 
-... world'
+..world'
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
@@ -88,7 +88,7 @@ Resolve: 'Hello'
 ```js
 > Promise.resolve('Hello world')
 Resolve: 'Hello 
-... world'
+..world'
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed

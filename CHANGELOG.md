@@ -1,3 +1,6 @@
+5.0.0 (May 2, 2018)
+ * changed line continuation to use .. instead of ... to make it possible for format code
+
 4.0.0 (May 1, 2018)
  * added line continuation
 

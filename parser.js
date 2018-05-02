@@ -36,7 +36,7 @@ module.exports = (lines) => {
         type: 'error code',
         errorCode: line.substring('Error code: '.length)
       })
-    } else if (line.startsWith('... ')) {
+    } else if (line.startsWith('..')) {
       if (result.length === 0) {
         throw new Error('Continuation must be preceded input or expected output. Cannot start with a continuation.')
       }
@@ -44,7 +44,7 @@ module.exports = (lines) => {
       if (['reject error', 'reject error code', 'error', 'error code'].includes(type)) {
         throw new Error(`Continuation is not supported for ${type}.`)
       }
-      result[result.length - 1].code = `${code.trim()} ${line.substring('... '.length).trim()}`
+      result[result.length - 1].code = `${code.trim()} ${line.substring('..'.length).trim()}`
     } else {
       result.push({
         type: 'output',
