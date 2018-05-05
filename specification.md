@@ -27,18 +27,18 @@ This is a `spec-check` report which is also an executable specification for `spe
 ### `>` can be continued with `...`
 
 ```js
-> 'Hello
-..world'
+> 'Hello ' +
+..'world'
 'Hello world'
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
-### Continuations collapses all whitespace to a single space
+### Continuations collapses all whitespace to a single newline
 
 ```js
-> 'Hello     
-..      world'
+> 'Hello ' +      
+..      'world'
 'Hello world'
 ```
 
@@ -47,10 +47,10 @@ This is a `spec-check` report which is also an executable specification for `spe
 ### There can be multiple continuations
 
 ```js
-> 'Hell
-..o 
-..world'
-'Hell o world'
+> 'Hell' +
+..'o ' +
+..'world'
+'Hello world'
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
@@ -68,8 +68,8 @@ This is a `spec-check` report which is also an executable specification for `spe
 
 ```js
 > 'Hello world'
-'Hello 
-..world'
+'Hello ' +
+..'world'
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
@@ -87,8 +87,8 @@ Resolve: 'Hello'
 
 ```js
 > Promise.resolve('Hello world')
-Resolve: 'Hello 
-..world'
+Resolve: 'Hello ' +
+..'world'
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed

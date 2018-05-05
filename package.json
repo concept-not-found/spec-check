@@ -1,6 +1,6 @@
 {
   "name": "spec-check",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Executable specification in Markdown for Javascript",
   "main": "index.js",
   "bin": {
@@ -30,7 +30,7 @@
     "minimist": "1.2.0",
     "remark-parse": "5.0.0",
     "remark-stringify": "5.0.0",
-    "unified": "6.1.6"
+    "unified": "6.2.0"
   },
   "devDependencies": {
     "eslint": "4.18.2",

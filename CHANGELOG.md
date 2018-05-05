@@ -1,3 +1,6 @@
+6.0.0 (May 4, 2018)
+ * change continuations to collapse down to newline instead of space
+
 5.0.0 (May 2, 2018)
  * changed line continuation to use .. instead of ... to make it possible for format code
 

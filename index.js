@@ -34,7 +34,7 @@ function parseOptions ({_: options, report}) {
     documentFilename
   }
 }
-function flatmap (arrays) {
+function flatten (arrays) {
   return [].concat(...arrays)
 }
 async function linearize (closure, array) {
@@ -54,9 +54,8 @@ function SpecCheck ({requires, errors}) {
   Object.keys(requires).forEach((name) => {
     eval(`${name} = require('${path.join(process.cwd(), requires[name])}')`) // eslint-disable-line no-eval
   })
-  // transformer cannot be async due to https://github.com/unifiedjs/unified/issues/35
-  return (root) => {
-    return linearize(async (node) => {
+  return async (root) => {
+    root.children = flatten(await linearize(async (node) => {
       if (!(node.type === 'code' && ['js', 'javascript'].includes(node.lang))) {
         return [node]
       }
@@ -182,11 +181,8 @@ function SpecCheck ({requires, errors}) {
           ]
         }]
       }
-    }, root.children)
-      .then((result) => {
-        root.children = flatmap(result)
-        return root
-      })
+    }, root.children))
+    return root
   }
 }
 

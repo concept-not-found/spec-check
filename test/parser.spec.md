@@ -4,50 +4,50 @@ https://docs.google.com/drawings/d/1qdtwPuC7Izr63pw_YgeQsVBB78v3gLv8ijrnHd0o-6c/
 
 ## a single input line
 ```js
-> parser(['> "some input"'])
-[{type: 'input', code: '"some input"'}]
+> parser(['> some input'])
+[{type: 'input', code: 'some input'}]
 ```
 
 ## a continued input line
 ```js
-> parser(['> "some', '..input"'])
-[{type: 'input', code: '"some input"'}]
+> parser(['> some', '..input'])
+[{type: 'input', code: 'some\ninput'}]
 ```
 
 ## a single output line
 ```js
-> parser(['"some output"'])
-[{type: 'output', code: '"some output"'}]
+> parser(['some output'])
+[{type: 'output', code: 'some output'}]
 ```
 
 ## a continued output line
 ```js
-> parser(['"some', '..output"'])
-[{type: 'output', code: '"some output"'}]
+> parser(['some', '..output'])
+[{type: 'output', code: 'some\noutput'}]
 ```
 
 ## a single resolve line
 ```js
-> parser(['Resolve: "some resolve"'])
-[{type: 'resolve', code: '"some resolve"'}]
+> parser(['Resolve: some resolve'])
+[{type: 'resolve', code: 'some resolve'}]
 ```
 
 ## a continued resolve line
 ```js
-> parser(['Resolve: "some', '..resolve"'])
-[{type: 'resolve', code: '"some resolve"'}]
+> parser(['Resolve: some', '..resolve'])
+[{type: 'resolve', code: 'some\nresolve'}]
 ```
 
 ## a single reject line
 ```js
-> parser(['Reject: "some reject"'])
-[{type: 'reject', code: '"some reject"'}]
+> parser(['Reject: some reject'])
+[{type: 'reject', code: 'some reject'}]
 ```
 
 ## a continued reject line
 ```js
-> parser(['Reject: "some', '..reject"'])
-[{type: 'reject', code: '"some reject"'}]
+> parser(['Reject: some', '..reject'])
+[{type: 'reject', code: 'some\nreject'}]
 ```
 
 ## a reject error
@@ -100,14 +100,14 @@ Error: Continuation is not supported for error code.
 
 ## multiple continuations
 ```js
-> parser(['> "so', '..me', '..in', '..tput"'])
-[{type: 'input', code: '"so me in tput"'}]
+> parser(['> so', '..me', '..in', '..tput'])
+[{type: 'input', code: 'so\nme\nin\ntput'}]
 ```
 
 ## whitespace in continuation is collapsed
 ```js
-> parser(['> "some       ', '..        input"'])
-[{type: 'input', code: '"some input"'}]
+> parser(['> some       ', '..        input'])
+[{type: 'input', code: 'some\ninput'}]
 ```
 
 ## cannot have continuation in the first line

@@ -44,7 +44,7 @@ module.exports = (lines) => {
       if (['reject error', 'reject error code', 'error', 'error code'].includes(type)) {
         throw new Error(`Continuation is not supported for ${type}.`)
       }
-      result[result.length - 1].code = `${code.trim()} ${line.substring('..'.length).trim()}`
+      result[result.length - 1].code = `${code.trim()}\n${line.substring('..'.length).trim()}`
     } else {
       result.push({
         type: 'output',
