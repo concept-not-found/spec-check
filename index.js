@@ -62,16 +62,21 @@ function SpecCheck ({requires, errors}) {
       const rawLines = node.value.split('\n')
       let input
       let result
+      let inputFailed
       let expected
       try {
         const lines = parser(rawLines)
         for (let i = 0; i < lines.length; i++) {
           if (lines[i].type === 'input') {
+            if (inputFailed) {
+              continue
+            }
             input = lines[i].code
             try {
               result = scopedEval(input)
             } catch (error) {
               result = error
+              inputFailed = true
             }
           } else {
             if (i === 0) {

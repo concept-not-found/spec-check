@@ -1,6 +1,6 @@
 {
   "name": "spec-check",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "description": "Executable specification in Markdown for Javascript",
   "main": "index.js",
   "bin": {

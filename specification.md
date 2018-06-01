@@ -217,12 +217,12 @@ throw new Error('oops')
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed
 
-### multiple input lines swallow earlier errors
+### input errors fail first
 
 ```js
-> throw new Error('oops')
-> 'Everything is fine.'
-'Everything is fine.'
+> throw new Error('first')
+> throw new Error('second')
+Error: first
 ```
 
 ✅ [`spec-check`](https://github.com/concept-not-found/spec-check)ed

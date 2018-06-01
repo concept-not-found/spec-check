@@ -1,3 +1,6 @@
+7.0.0 (May 31, 2018)
+ * first input line error is propagated as result
+
 6.0.0 (May 4, 2018)
  * change continuations to collapse down to newline instead of space
 
